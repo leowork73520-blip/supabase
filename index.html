@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Manager - Airtable Powered</title>
+    <title>Contact Us</title>
     <style>
         * {
             margin: 0;
@@ -15,97 +15,36 @@
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
 
-        /* Navigation */
-        .nav {
-            background: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .container {
+            max-width: 500px;
+            width: 100%;
         }
 
-        .nav h1 {
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
             color: #667eea;
-            font-size: 24px;
+            margin-bottom: 10px;
+            font-size: 28px;
         }
 
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
             font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
         }
 
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #4a5568;
-        }
-
-        .btn-secondary:hover {
-            background: #cbd5e0;
-        }
-
-        .btn-success {
-            background: #48bb78;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #38a169;
-        }
-
-        .btn-danger {
-            background: #fc8181;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #f56565;
-        }
-
-        /* Sections */
-        .section {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        /* Form Styles */
         .form-group {
             margin-bottom: 20px;
         }
@@ -115,6 +54,7 @@
             margin-bottom: 5px;
             color: #4a5568;
             font-weight: 600;
+            font-size: 14px;
         }
 
         .form-group input,
@@ -124,206 +64,82 @@
             border: 2px solid #e2e8f0;
             border-radius: 5px;
             font-size: 16px;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
 
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+            font-size: 14px;
         }
 
         .success-message {
             background: #c6f6d5;
             color: #22543d;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            display: none;
+            border: 1px solid #9ae6b4;
         }
 
         .error-message {
             background: #fed7d7;
             color: #742a2a;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            display: none;
+            border: 1px solid #feb2b2;
         }
 
-        /* Admin Panel Styles */
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .filters {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            border: 2px solid #e2e8f0;
-            background: white;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .filter-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .search-box {
-            padding: 10px;
-            border: 2px solid #e2e8f0;
-            border-radius: 5px;
-            font-size: 14px;
-            width: 250px;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-        }
-
-        .stat-card h3 {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 10px;
-        }
-
-        .stat-card .number {
-            font-size: 32px;
-            font-weight: bold;
-        }
-
-        .contacts-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .contacts-table th {
-            background: #f7fafc;
-            padding: 12px;
-            text-align: left;
-            color: #4a5568;
-            font-weight: 600;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .contacts-table td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .contacts-table tr:hover {
-            background: #f7fafc;
-        }
-
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-pending {
-            background: #fefcbf;
-            color: #744210;
-        }
-
-        .status-approved {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .status-rejected {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-
-        .loading {
+        .admin-link {
             text-align: center;
-            padding: 40px;
-            color: #a0aec0;
+            margin-top: 20px;
+            font-size: 12px;
+            color: white;
+            opacity: 0.7;
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        .admin-link a {
+            color: white;
+            text-decoration: underline;
         }
 
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        @media (max-width: 768px) {
-            .nav {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .contacts-table {
-                font-size: 14px;
-            }
-            
-            .contacts-table th,
-            .contacts-table td {
-                padding: 8px;
+        @media (max-width: 600px) {
+            .form-card {
+                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Navigation -->
-        <nav class="nav">
-            <h1>📋 Contact Manager</h1>
-            <div class="nav-buttons">
-                <button class="btn btn-primary" onclick="showSection('contact')">Contact Form</button>
-                <button class="btn btn-secondary" onclick="showSection('admin')">Admin Panel</button>
-            </div>
-        </nav>
-
-        <!-- Contact Form Section -->
-        <div id="contactSection" class="section active">
-            <h2>Contact Us</h2>
-            <p style="color: #718096; margin-bottom: 30px;">Fill out the form below and we'll get back to you.</p>
+        <div class="form-card">
+            <h1>📋 Contact Us</h1>
+            <p class="subtitle">Fill out the form below and we'll get back to you.</p>
             
             <form id="contactForm">
                 <div class="form-group">
@@ -346,61 +162,19 @@
                     <textarea id="message" rows="4" placeholder="Your message here..."></textarea>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Submit Contact</button>
+                <button type="submit" class="btn-submit">Submit Contact</button>
             </form>
             
-            <div id="successMessage" class="success-message">
+            <div id="successMessage" class="message success-message">
                 ✅ Your contact has been submitted successfully!
             </div>
-            <div id="errorMessage" class="error-message">
+            <div id="errorMessage" class="message error-message">
                 ❌ Error submitting contact. Please try again.
             </div>
         </div>
-
-        <!-- Admin Panel Section -->
-        <div id="adminSection" class="section">
-            <div class="admin-header">
-                <h2>Admin Dashboard</h2>
-                <div class="filters">
-                    <input type="text" class="search-box" placeholder="🔍 Search contacts..." id="searchInput">
-                    <button class="filter-btn active" onclick="filterContacts('all')">All</button>
-                    <button class="filter-btn" onclick="filterContacts('Pending')">Pending</button>
-                    <button class="filter-btn" onclick="filterContacts('Approved')">Approved</button>
-                    <button class="filter-btn" onclick="filterContacts('Rejected')">Rejected</button>
-                </div>
-            </div>
-
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>Total Contacts</h3>
-                    <div class="number" id="totalCount">0</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
-                    <h3>Pending</h3>
-                    <div class="number" id="pendingCount">0</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
-                    <h3>Approved</h3>
-                    <div class="number" id="approvedCount">0</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                    <h3>Rejected</h3>
-                    <div class="number" id="rejectedCount">0</div>
-                </div>
-            </div>
-
-            <div id="contactsContainer">
-                <div class="loading">Loading contacts...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h3>Update Contact Status</h3>
-            <div id="modalContent"></div>
-            <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 20px;">Close</button>
+        
+        <div class="admin-link">
+            <a href="/admin.html">Admin Panel</a>
         </div>
     </div>
 
@@ -412,25 +186,13 @@
 
         const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
 
-        let allContacts = [];
-        let currentFilter = 'all';
-
-        // Navigation
-        function showSection(section) {
-            document.getElementById('contactSection').classList.remove('active');
-            document.getElementById('adminSection').classList.remove('active');
-            
-            if (section === 'contact') {
-                document.getElementById('contactSection').classList.add('active');
-            } else {
-                document.getElementById('adminSection').classList.add('active');
-                loadContacts();
-            }
-        }
-
         // Contact Form Submission
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
             
             const formData = {
                 fields: {
@@ -460,7 +222,7 @@
                     
                     setTimeout(() => {
                         document.getElementById('successMessage').style.display = 'none';
-                    }, 3000);
+                    }, 5000);
                 } else {
                     throw new Error('Submission failed');
                 }
@@ -470,188 +232,11 @@
                 
                 setTimeout(() => {
                     document.getElementById('errorMessage').style.display = 'none';
-                }, 3000);
+                }, 5000);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Contact';
             }
-        });
-
-        // Load Contacts for Admin Panel
-        async function loadContacts() {
-            document.getElementById('contactsContainer').innerHTML = '<div class="loading">Loading contacts...</div>';
-            
-            try {
-                const response = await fetch(`${AIRTABLE_URL}?sort%5B0%5D%5Bfield%5D=Submitted%20At&sort%5B0%5D%5Bdirection%5D=desc`, {
-                    headers: {
-                        'Authorization': `Bearer ${AIRTABLE_API_KEY}`
-                    }
-                });
-
-                const data = await response.json();
-                allContacts = data.records;
-                displayContacts();
-                updateStats();
-            } catch (error) {
-                document.getElementById('contactsContainer').innerHTML = 
-                    '<div class="error-message" style="display:block;">❌ Error loading contacts. Please check your Airtable configuration.</div>';
-            }
-        }
-
-        // Display Contacts
-        function displayContacts(filteredContacts = null) {
-            const contacts = filteredContacts || allContacts;
-            const container = document.getElementById('contactsContainer');
-
-            if (contacts.length === 0) {
-                container.innerHTML = '<div class="loading">No contacts found</div>';
-                return;
-            }
-
-            let html = `
-                <table class="contacts-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Email</th>
-                            <th>Message</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            contacts.forEach(contact => {
-                const fields = contact.fields;
-                const status = fields.Status || 'Pending';
-                const date = fields['Submitted At'] ? new Date(fields['Submitted At']).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) : 'N/A';
-
-                html += `
-                    <tr>
-                        <td><strong>${fields.Name || 'N/A'}</strong></td>
-                        <td>${fields.Phone || 'N/A'}</td>
-                        <td>${fields.Email || 'N/A'}</td>
-                        <td>${(fields.Message || '').substring(0, 50)}${(fields.Message || '').length > 50 ? '...' : ''}</td>
-                        <td><span class="status-badge status-${status.toLowerCase()}">${status}</span></td>
-                        <td>${date}</td>
-                        <td>
-                            <button class="btn btn-success" style="padding:5px 10px; font-size:12px;" onclick="updateStatus('${contact.id}', 'Approved')">✓</button>
-                            <button class="btn btn-danger" style="padding:5px 10px; font-size:12px;" onclick="updateStatus('${contact.id}', 'Rejected')">✕</button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        }
-
-        // Update Statistics
-        function updateStats() {
-            const total = allContacts.length;
-            const pending = allContacts.filter(c => c.fields.Status === 'Pending' || !c.fields.Status).length;
-            const approved = allContacts.filter(c => c.fields.Status === 'Approved').length;
-            const rejected = allContacts.filter(c => c.fields.Status === 'Rejected').length;
-
-            document.getElementById('totalCount').textContent = total;
-            document.getElementById('pendingCount').textContent = pending;
-            document.getElementById('approvedCount').textContent = approved;
-            document.getElementById('rejectedCount').textContent = rejected;
-        }
-
-        // Filter Contacts
-        function filterContacts(status) {
-            currentFilter = status;
-            
-            // Update active button
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // Filter contacts
-            if (status === 'all') {
-                displayContacts();
-            } else {
-                const filtered = allContacts.filter(c => c.fields.Status === status);
-                displayContacts(filtered);
-            }
-        }
-
-        // Search Functionality
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            
-            let contactsToSearch = allContacts;
-            if (currentFilter !== 'all') {
-                contactsToSearch = allContacts.filter(c => c.fields.Status === currentFilter);
-            }
-
-            const filtered = contactsToSearch.filter(contact => {
-                const fields = contact.fields;
-                return (
-                    (fields.Name || '').toLowerCase().includes(searchTerm) ||
-                    (fields.Phone || '').toLowerCase().includes(searchTerm) ||
-                    (fields.Email || '').toLowerCase().includes(searchTerm) ||
-                    (fields.Message || '').toLowerCase().includes(searchTerm)
-                );
-            });
-
-            displayContacts(filtered);
-        });
-
-        // Update Contact Status
-        async function updateStatus(recordId, status) {
-            try {
-                const response = await fetch(`${AIRTABLE_URL}/${recordId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        fields: {
-                            Status: status
-                        }
-                    })
-                });
-
-                if (response.ok) {
-                    // Update local data
-                    const contact = allContacts.find(c => c.id === recordId);
-                    if (contact) {
-                        contact.fields.Status = status;
-                    }
-                    
-                    // Refresh display
-                    filterContacts(currentFilter);
-                    updateStats();
-                }
-            } catch (error) {
-                alert('Error updating status');
-            }
-        }
-
-        // Modal Functions
-        function openModal(content) {
-            document.getElementById('modalContent').innerHTML = content;
-            document.getElementById('editModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('editModal').classList.remove('active');
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Contact Manager initialized');
-            console.log('Remember to update AIRTABLE_API_KEY and AIRTABLE_BASE_ID');
         });
     </script>
 </body>
