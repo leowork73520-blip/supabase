@@ -91,10 +91,6 @@
             transform: translateY(-2px);
         }
 
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
         .btn-submit:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -131,12 +127,6 @@
         .admin-link a {
             color: white;
             text-decoration: underline;
-        }
-
-        @media (max-width: 600px) {
-            .form-card {
-                padding: 20px;
-            }
         }
     </style>
 </head>
@@ -179,7 +169,7 @@
         </div>
         
         <div class="admin-link">
-            <a href="/admin.html">Admin Panel</a>
+            <a href="admin.html">Admin Panel</a>
         </div>
     </div>
 
@@ -191,7 +181,6 @@
         
         const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
 
-        // Contact Form Submission
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -210,8 +199,6 @@
                 }
             };
 
-            console.log('Sending data:', formData);
-
             try {
                 const response = await fetch(AIRTABLE_URL, {
                     method: 'POST',
@@ -223,7 +210,6 @@
                 });
 
                 const data = await response.json();
-                console.log('Response:', data);
 
                 if (response.ok) {
                     document.getElementById('successMessage').style.display = 'block';
@@ -234,14 +220,9 @@
                         document.getElementById('successMessage').style.display = 'none';
                     }, 5000);
                 } else {
-                    const errorMsg = data.error?.message || 'Unknown error';
-                    document.getElementById('errorMessage').innerHTML = `❌ ${errorMsg}`;
-                    document.getElementById('errorMessage').style.display = 'block';
-                    document.getElementById('successMessage').style.display = 'none';
+                    throw new Error(data.error?.message || 'Submission failed');
                 }
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('errorMessage').innerHTML = `❌ Network error. Please try again.`;
                 document.getElementById('errorMessage').style.display = 'block';
                 document.getElementById('successMessage').style.display = 'none';
             } finally {
