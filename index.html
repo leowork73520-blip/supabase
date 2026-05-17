@@ -2,232 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 500px;
-            width: 100%;
-        }
-
-        .form-card {
-            background: white;
-            border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-
-        h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-
-        .subtitle {
-            color: #718096;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #4a5568;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            display: none;
-            font-size: 14px;
-        }
-
-        .success-message {
-            background: #c6f6d5;
-            color: #22543d;
-            border: 1px solid #9ae6b4;
-        }
-
-        .error-message {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 1px solid #feb2b2;
-        }
-
-        .admin-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: white;
-            opacity: 0.7;
-        }
-
-        .admin-link a {
-            color: white;
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="form-card">
-            <h1>📋 Contact Us</h1>
-            <p class="subtitle">Fill out the form below and we'll get back to you.</p>
-            
-            <form id="contactForm">
-                <div class="form-group">
-                    <label for="name">Full Name *</label>
-                    <input type="text" id="name" required placeholder="John Doe">
-                </div>
-                
-                <div class="form-group">
-                    <label for="phone">Phone Number *</label>
-                    <input type="tel" id="phone" required placeholder="+1 (555) 123-4567">
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" placeholder="john@example.com">
-                </div>
-                
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" rows="4" placeholder="Your message here..."></textarea>
-                </div>
-                
-                <button type="submit" class="btn-submit">Submit Contact</button>
-            </form>
-            
-            <div id="successMessage" class="message success-message">
-                ✅ Your contact has been submitted successfully!
-            </div>
-            <div id="errorMessage" class="message error-message">
-                ❌ Error submitting contact. Please try again.
-            </div>
-        </div>
+    <h1>Contact Support</h1>
+    <form id="contactForm">
+        <label>Name:</label>
+        <input type="text" id="name" required>
         
-        <div class="admin-link">
-            <a href="admin.html">Admin Panel</a>
-        </div>
-    </div>
+        <label>Phone:</label>
+        <input type="tel" id="phone" required>
+        
+        <label>Email:</label>
+        <input type="email" id="email">
+        
+        <label>Message:</label>
+        <textarea id="message" rows="4"></textarea>
+        
+        <button type="submit">Submit Request</button>
+    </form>
 
     <script>
-        // Airtable Configuration
-        const AIRTABLE_API_KEY = 'pat1E4YBqW3AzDjR9.2191c56e6275f85eaf02e1808fb62860eaa90f5840aafcaf45042d86dca6523b';
-        const AIRTABLE_BASE_ID = 'appaF6QvPYLRhaUsU';
-        const AIRTABLE_TABLE_NAME = 'Contacts';
-        
-        const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
+        // CONFIGURATION: Replace with your actual Supabase URL and Anon Key
+        const SUPABASE_URL = 'https://decsarjhkrfvuxrsvzoo.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_HmrALuQ6Ta0lThN3AmZH_w_b2QQ9iSU';
+        const supabase = lib.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            
-            const formData = {
-                fields: {
-                    'Name': document.getElementById('name').value.trim(),
-                    'Phone': document.getElementById('phone').value.trim(),
-                    'Email': document.getElementById('email').value.trim(),
-                    'Message': document.getElementById('message').value.trim(),
-                    'Status': 'Pending',
-                    'Submitted At': new Date().toISOString()
-                }
-            };
+            const { data, error } = await supabase.from('contacts').insert([{
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            }]);
 
-            try {
-                const response = await fetch(AIRTABLE_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    document.getElementById('successMessage').style.display = 'block';
-                    document.getElementById('errorMessage').style.display = 'none';
-                    document.getElementById('contactForm').reset();
-                    
-                    setTimeout(() => {
-                        document.getElementById('successMessage').style.display = 'none';
-                    }, 5000);
-                } else {
-                    throw new Error(data.error?.message || 'Submission failed');
-                }
-            } catch (error) {
-                document.getElementById('errorMessage').style.display = 'block';
-                document.getElementById('successMessage').style.display = 'none';
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Contact';
+            if (error) alert("Error: " + error.message);
+            else {
+                alert("Thank you! Your message was sent.");
+                document.getElementById('contactForm').reset();
             }
         });
     </script>
