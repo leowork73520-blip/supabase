@@ -95,6 +95,11 @@
             transform: translateY(0);
         }
 
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .message {
             padding: 15px;
             border-radius: 5px;
@@ -179,11 +184,11 @@
     </div>
 
     <script>
-        // CONFIGURATION - Replace with your Airtable credentials
+        // Airtable Configuration
         const AIRTABLE_API_KEY = 'pat1E4YBqW3AzDjR9.2191c56e6275f85eaf02e1808fb62860eaa90f5840aafcaf45042d86dca6523b';
         const AIRTABLE_BASE_ID = 'appaF6QvPYLRhaUsU';
         const AIRTABLE_TABLE_NAME = 'Contacts';
-
+        
         const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
 
         // Contact Form Submission
@@ -196,14 +201,16 @@
             
             const formData = {
                 fields: {
-                    Name: document.getElementById('name').value,
-                    Phone: document.getElementById('phone').value,
-                    Email: document.getElementById('email').value,
-                    Message: document.getElementById('message').value,
-                    Status: 'Pending',
+                    'Name': document.getElementById('name').value.trim(),
+                    'Phone': document.getElementById('phone').value.trim(),
+                    'Email': document.getElementById('email').value.trim(),
+                    'Message': document.getElementById('message').value.trim(),
+                    'Status': 'Pending',
                     'Submitted At': new Date().toISOString()
                 }
             };
+
+            console.log('Sending data:', formData);
 
             try {
                 const response = await fetch(AIRTABLE_URL, {
@@ -215,6 +222,9 @@
                     body: JSON.stringify(formData)
                 });
 
+                const data = await response.json();
+                console.log('Response:', data);
+
                 if (response.ok) {
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('errorMessage').style.display = 'none';
@@ -224,15 +234,16 @@
                         document.getElementById('successMessage').style.display = 'none';
                     }, 5000);
                 } else {
-                    throw new Error('Submission failed');
+                    const errorMsg = data.error?.message || 'Unknown error';
+                    document.getElementById('errorMessage').innerHTML = `❌ ${errorMsg}`;
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('successMessage').style.display = 'none';
                 }
             } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').innerHTML = `❌ Network error. Please try again.`;
                 document.getElementById('errorMessage').style.display = 'block';
                 document.getElementById('successMessage').style.display = 'none';
-                
-                setTimeout(() => {
-                    document.getElementById('errorMessage').style.display = 'none';
-                }, 5000);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Contact';
