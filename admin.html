@@ -17,7 +17,6 @@
             min-height: 100vh;
         }
 
-        /* Login Overlay */
         .login-overlay {
             position: fixed;
             top: 0;
@@ -72,7 +71,6 @@
             display: none;
         }
 
-        /* Main Admin Panel */
         .admin-panel {
             display: none;
         }
@@ -423,8 +421,7 @@
 
     <script>
         // ==================== CONFIGURATION ====================
-        // Change these credentials!
-        const ADMIN_PASSWORD = 'admin123'; // CHANGE THIS PASSWORD
+        const ADMIN_PASSWORD = 'admin123'; // Change this password
         
         const AIRTABLE_API_KEY = 'pat1E4YBqW3AzDjR9.2191c56e6275f85eaf02e1808fb62860eaa90f5840aafcaf45042d86dca6523b';
         const AIRTABLE_BASE_ID = 'appaF6QvPYLRhaUsU';
@@ -441,14 +438,9 @@
             const password = document.getElementById('passwordInput').value;
             
             if (password === ADMIN_PASSWORD) {
-                // Store login state
                 sessionStorage.setItem('adminLoggedIn', 'true');
-                
-                // Hide login, show admin panel
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
-                
-                // Load contacts
                 loadContacts();
             } else {
                 document.getElementById('loginError').style.display = 'block';
@@ -466,7 +458,6 @@
             location.reload();
         }
 
-        // Check if already logged in
         window.addEventListener('load', () => {
             if (sessionStorage.getItem('adminLoggedIn') === 'true') {
                 document.getElementById('loginOverlay').style.display = 'none';
@@ -589,16 +580,13 @@
         function filterContacts(status) {
             currentFilter = status;
             
-            // Update active button
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
 
-            // Clear search
             document.getElementById('searchInput').value = '';
 
-            // Filter contacts
             if (status === 'all') {
                 displayContacts();
             } else {
@@ -646,13 +634,11 @@
                 });
 
                 if (response.ok) {
-                    // Update local data
                     const contact = allContacts.find(c => c.id === recordId);
                     if (contact) {
                         contact.fields.Status = status;
                     }
                     
-                    // Refresh display
                     filterContacts(currentFilter);
                     updateStats();
                 }
