@@ -321,11 +321,6 @@
             color: #a0aec0;
         }
 
-        .empty-state .icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -342,15 +337,6 @@
                 margin-left: 0;
             }
             
-            .contacts-table {
-                font-size: 12px;
-            }
-            
-            .contacts-table th,
-            .contacts-table td {
-                padding: 10px 8px;
-            }
-            
             .action-buttons {
                 flex-direction: column;
             }
@@ -358,11 +344,10 @@
     </style>
 </head>
 <body>
-    <!-- Login Overlay -->
     <div id="loginOverlay" class="login-overlay">
         <div class="login-card">
             <h2>🔒 Admin Login</h2>
-            <p>Enter your credentials to access the admin panel</p>
+            <p>Enter password to access admin panel</p>
             
             <input type="password" id="passwordInput" placeholder="Enter admin password" onkeypress="if(event.key==='Enter') login()">
             <button class="btn btn-primary" onclick="login()" style="width:100%;">Login</button>
@@ -373,13 +358,12 @@
         </div>
     </div>
 
-    <!-- Admin Panel (Hidden until login) -->
     <div id="adminPanel" class="admin-panel">
         <div class="container">
             <div class="header">
                 <h1>📊 Contact Manager Dashboard</h1>
                 <div class="header-actions">
-                    <a href="/index.html" class="btn btn-secondary">← View Site</a>
+                    <a href="index.html" class="btn btn-secondary">← View Site</a>
                     <button class="btn btn-logout" onclick="logout()">Logout</button>
                 </div>
             </div>
@@ -404,11 +388,11 @@
             </div>
 
             <div class="filters-bar">
-                <button class="filter-btn active" onclick="filterContacts('all')">📋 All Contacts</button>
+                <button class="filter-btn active" onclick="filterContacts('all')">📋 All</button>
                 <button class="filter-btn" onclick="filterContacts('Pending')">⏳ Pending</button>
                 <button class="filter-btn" onclick="filterContacts('Approved')">✅ Approved</button>
                 <button class="filter-btn" onclick="filterContacts('Rejected')">❌ Rejected</button>
-                <input type="text" class="search-box" placeholder="🔍 Search by name, phone, email..." id="searchInput">
+                <input type="text" class="search-box" placeholder="🔍 Search..." id="searchInput">
             </div>
 
             <div class="table-container">
@@ -420,20 +404,17 @@
     </div>
 
     <script>
-        // ==================== CONFIGURATION ====================
-        const ADMIN_PASSWORD = 'admin123'; // Change this password
+        const ADMIN_PASSWORD = 'admin123';
         
         const AIRTABLE_API_KEY = 'pat1E4YBqW3AzDjR9.2191c56e6275f85eaf02e1808fb62860eaa90f5840aafcaf45042d86dca6523b';
         const AIRTABLE_BASE_ID = 'appaF6QvPYLRhaUsU';
         const AIRTABLE_TABLE_NAME = 'Contacts';
         
         const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
-        // ======================================================
 
         let allContacts = [];
         let currentFilter = 'all';
 
-        // ==================== LOGIN SYSTEM ====================
         function login() {
             const password = document.getElementById('passwordInput').value;
             
@@ -466,7 +447,6 @@
             }
         });
 
-        // ==================== LOAD CONTACTS ====================
         async function loadContacts() {
             document.getElementById('contactsContainer').innerHTML = '<div class="loading">Loading contacts...</div>';
             
@@ -486,15 +466,14 @@
             } catch (error) {
                 document.getElementById('contactsContainer').innerHTML = `
                     <div class="empty-state">
-                        <div class="icon">⚠️</div>
-                        <h3>Error loading contacts</h3>
-                        <p>Please check your Airtable configuration</p>
+                        <h3>⚠️ Error loading contacts</h3>
+                        <p>Check console for details</p>
                     </div>
                 `;
+                console.error(error);
             }
         }
 
-        // ==================== DISPLAY CONTACTS ====================
         function displayContacts(filteredContacts = null) {
             const contacts = filteredContacts || allContacts;
             const container = document.getElementById('contactsContainer');
@@ -502,9 +481,8 @@
             if (contacts.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="icon">📭</div>
-                        <h3>No contacts found</h3>
-                        <p>${currentFilter === 'all' ? 'No contacts have been submitted yet' : 'No contacts with this status'}</p>
+                        <h3>📭 No contacts found</h3>
+                        <p>${currentFilter === 'all' ? 'No contacts submitted yet' : 'No contacts with this status'}</p>
                     </div>
                 `;
                 return;
@@ -542,17 +520,13 @@
                         <td><strong>${fields.Name || 'N/A'}</strong></td>
                         <td>${fields.Phone || 'N/A'}</td>
                         <td>${fields.Email || 'N/A'}</td>
-                        <td>${(fields.Message || 'No message').substring(0, 50)}${(fields.Message || '').length > 50 ? '...' : ''}</td>
+                        <td>${(fields.Message || '').substring(0, 50)}${(fields.Message || '').length > 50 ? '...' : ''}</td>
                         <td><span class="status-badge status-${status.toLowerCase()}">${status}</span></td>
                         <td>${date}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-success" onclick="updateStatus('${contact.id}', 'Approved')" title="Approve">
-                                    ✓ Approve
-                                </button>
-                                <button class="btn btn-danger" onclick="updateStatus('${contact.id}', 'Rejected')" title="Reject">
-                                    ✕ Reject
-                                </button>
+                                <button class="btn btn-success" onclick="updateStatus('${contact.id}', 'Approved')">✓</button>
+                                <button class="btn btn-danger" onclick="updateStatus('${contact.id}', 'Rejected')">✕</button>
                             </div>
                         </td>
                     </tr>
@@ -563,26 +537,17 @@
             container.innerHTML = html;
         }
 
-        // ==================== UPDATE STATS ====================
         function updateStats() {
-            const total = allContacts.length;
-            const pending = allContacts.filter(c => (c.fields.Status || 'Pending') === 'Pending').length;
-            const approved = allContacts.filter(c => c.fields.Status === 'Approved').length;
-            const rejected = allContacts.filter(c => c.fields.Status === 'Rejected').length;
-
-            document.getElementById('totalCount').textContent = total;
-            document.getElementById('pendingCount').textContent = pending;
-            document.getElementById('approvedCount').textContent = approved;
-            document.getElementById('rejectedCount').textContent = rejected;
+            document.getElementById('totalCount').textContent = allContacts.length;
+            document.getElementById('pendingCount').textContent = allContacts.filter(c => (c.fields.Status || 'Pending') === 'Pending').length;
+            document.getElementById('approvedCount').textContent = allContacts.filter(c => c.fields.Status === 'Approved').length;
+            document.getElementById('rejectedCount').textContent = allContacts.filter(c => c.fields.Status === 'Rejected').length;
         }
 
-        // ==================== FILTER CONTACTS ====================
         function filterContacts(status) {
             currentFilter = status;
             
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
 
             document.getElementById('searchInput').value = '';
@@ -590,34 +555,27 @@
             if (status === 'all') {
                 displayContacts();
             } else {
-                const filtered = allContacts.filter(c => (c.fields.Status || 'Pending') === status);
-                displayContacts(filtered);
+                displayContacts(allContacts.filter(c => (c.fields.Status || 'Pending') === status));
             }
         }
 
-        // ==================== SEARCH ====================
         document.getElementById('searchInput').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
+            const term = e.target.value.toLowerCase();
             
-            let contactsToSearch = allContacts;
+            let contacts = allContacts;
             if (currentFilter !== 'all') {
-                contactsToSearch = allContacts.filter(c => (c.fields.Status || 'Pending') === currentFilter);
+                contacts = allContacts.filter(c => (c.fields.Status || 'Pending') === currentFilter);
             }
 
-            const filtered = contactsToSearch.filter(contact => {
-                const fields = contact.fields;
-                return (
-                    (fields.Name || '').toLowerCase().includes(searchTerm) ||
-                    (fields.Phone || '').toLowerCase().includes(searchTerm) ||
-                    (fields.Email || '').toLowerCase().includes(searchTerm) ||
-                    (fields.Message || '').toLowerCase().includes(searchTerm)
-                );
-            });
-
-            displayContacts(filtered);
+            displayContacts(contacts.filter(c => {
+                const f = c.fields;
+                return (f.Name || '').toLowerCase().includes(term) ||
+                       (f.Phone || '').toLowerCase().includes(term) ||
+                       (f.Email || '').toLowerCase().includes(term) ||
+                       (f.Message || '').toLowerCase().includes(term);
+            }));
         });
 
-        // ==================== UPDATE STATUS ====================
         async function updateStatus(recordId, status) {
             try {
                 const response = await fetch(`${AIRTABLE_URL}/${recordId}`, {
@@ -626,24 +584,18 @@
                         'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        fields: {
-                            Status: status
-                        }
-                    })
+                    body: JSON.stringify({ fields: { Status: status } })
                 });
 
                 if (response.ok) {
                     const contact = allContacts.find(c => c.id === recordId);
-                    if (contact) {
-                        contact.fields.Status = status;
-                    }
+                    if (contact) contact.fields.Status = status;
                     
                     filterContacts(currentFilter);
                     updateStats();
                 }
             } catch (error) {
-                alert('Error updating status. Please try again.');
+                alert('Error updating status');
             }
         }
     </script>
