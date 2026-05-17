@@ -1,113 +1,381 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        .hidden { display: none; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; }
-        .Pending { background: #fff3cd; }
-        .Approved { background: #d4edda; }
-        .Rejected { background: #f8d7da; }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — ContactHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --a:#667eea;--b:#764ba2;--white:#fff;
+      --bg:#f1f3fb;--text:#12122a;--muted:#64748b;--border:#e2e8f0;
+      --p-bg:#fef3c7;--p-tx:#92400e;--p-bd:#fcd34d;
+      --ok-bg:#d1fae5;--ok-tx:#065f46;--ok-bd:#6ee7b7;
+      --no-bg:#fee2e2;--no-tx:#991b1b;--no-bd:#fca5a5;
+      --r:14px;--sh:0 4px 24px rgba(0,0,0,.06);
+    }
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+    /* ── LOGIN ── */
+    #LS{min-height:100vh;background:linear-gradient(135deg,var(--a),var(--b));display:flex;align-items:center;justify-content:center;padding:24px}
+    .lc{background:#fff;border-radius:var(--r);box-shadow:0 24px 64px rgba(0,0,0,.18);padding:48px 44px;width:100%;max-width:390px;animation:rise .45s cubic-bezier(.16,1,.3,1) both}
+    @keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+    .brand{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+    .ico{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--a),var(--b));display:flex;align-items:center;justify-content:center;font-size:18px}
+    .brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:-.4px}
+    .lc h2{font-family:'Syne',sans-serif;font-size:23px;font-weight:800;margin-bottom:5px;letter-spacing:-.4px}
+    .lc p{color:var(--muted);font-size:13px;margin-bottom:26px}
+    .fg{margin-bottom:18px}
+    label{display:block;font-size:13px;font-weight:500;margin-bottom:7px}
+    input[type=password]{width:100%;padding:12px 15px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:#f8fafc;transition:border-color .2s,box-shadow .2s}
+    input[type=password]:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(102,126,234,.12);background:#fff}
+    input[type=password].bad{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.1)}
+    .lerr{font-size:12px;color:#ef4444;margin-top:5px;display:none}
+    .lerr.on{display:block}
+    .btn-login{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .15s,box-shadow .2s}
+    .btn-login:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 8px 24px rgba(102,126,234,.4)}
+
+    /* ── PANEL ── */
+    #AP{display:none}
+    .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+    .tb-l{display:flex;align-items:center;gap:10px}
+    .tb-l .ico{width:34px;height:34px;font-size:16px}
+    .tb-l .brand-name{font-size:16px}
+    .badge-admin{background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;font-family:'Syne',sans-serif;letter-spacing:.5px;text-transform:uppercase}
+    .tb-r{display:flex;align-items:center;gap:10px}
+    .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--b));display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700}
+    .btn-out{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);transition:all .2s}
+    .btn-out:hover{border-color:#ef4444;color:#ef4444;background:#fef2f2}
+    .main{padding:28px;max-width:1320px;margin:0 auto}
+    .pt{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:5px}
+    .ps{color:var(--muted);font-size:13px;margin-bottom:24px}
+
+    /* stats */
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+    @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+    .sc{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--sh);border:1px solid var(--border);display:flex;align-items:center;gap:14px;transition:transform .2s,box-shadow .2s}
+    .sc:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.09)}
+    .si{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .si.all{background:#ede9fe}.si.pend{background:#fef3c7}.si.appr{background:#d1fae5}.si.rej{background:#fee2e2}
+    .sn{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1}
+    .sl{font-size:12px;color:var(--muted);margin-top:3px;font-weight:500}
+
+    /* toolbar */
+    .toolbar{background:#fff;border-radius:var(--r);padding:15px 18px;box-shadow:var(--sh);border:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .sw{position:relative;flex:1;min-width:200px}
+    .sw input{width:100%;padding:10px 14px 10px 36px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:#f8fafc;transition:border-color .2s,box-shadow .2s}
+    .sw input:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(102,126,234,.12);background:#fff}
+    .si2{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.45;pointer-events:none}
+    .filters{display:flex;gap:6px;flex-wrap:wrap}
+    .fb{padding:8px 13px;border-radius:8px;border:1.5px solid var(--border);background:transparent;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);transition:all .2s}
+    .fb:hover{border-color:var(--a);color:var(--a)}
+    .fb.active{background:linear-gradient(135deg,var(--a),var(--b));border-color:transparent;color:#fff}
+    .btn-ref{padding:9px 13px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-size:14px;transition:all .2s;color:var(--muted)}
+    .btn-ref:hover{border-color:var(--a);background:#f0f4ff}
+
+    /* table */
+    .tw{background:#fff;border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--border);overflow:hidden}
+    .th2{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+    .tt{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+    .tc{font-size:12px;color:var(--muted)}
+    .ts{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;min-width:720px}
+    thead th{padding:11px 16px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:#f8fafc;border-bottom:1px solid var(--border)}
+    tbody tr{border-bottom:1px solid #f0f2f8;transition:background .15s}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:#f9fbff}
+    td{padding:13px 16px;font-size:13px;vertical-align:middle}
+    td.nc{font-weight:600}
+    td.pc{font-family:monospace;font-size:12px}
+    td.mc{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+    td.dc{font-size:12px;color:var(--muted);white-space:nowrap}
+    .bdg{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid transparent}
+    .bdg-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .bdg.Pending{background:var(--p-bg);color:var(--p-tx);border-color:var(--p-bd)}.bdg.Pending .bdg-dot{background:#f59e0b}
+    .bdg.Approved{background:var(--ok-bg);color:var(--ok-tx);border-color:var(--ok-bd)}.bdg.Approved .bdg-dot{background:#10b981}
+    .bdg.Rejected{background:var(--no-bg);color:var(--no-tx);border-color:var(--no-bd)}.bdg.Rejected .bdg-dot{background:#ef4444}
+    .acts{display:flex;gap:6px}
+    .ba{padding:5px 11px;border-radius:7px;border:1.5px solid;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+    .ba-ok{border-color:#6ee7b7;color:#065f46;background:#f0fdf4}.ba-ok:hover{background:#dcfce7}
+    .ba-no{border-color:#fca5a5;color:#991b1b;background:#fff5f5}.ba-no:hover{background:#fee2e2}
+    .ba:disabled{opacity:.4;cursor:not-allowed}
+
+    /* states */
+    .empty,.loading-s,.error-s{padding:60px 24px;text-align:center;color:var(--muted)}
+    .ei{font-size:40px;margin-bottom:14px}
+    .empty h3,.error-s h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+    .empty p,.error-s p{font-size:13px}
+    .lsp{width:32px;height:32px;border:3px solid #e5e7eb;border-top-color:var(--a);border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 16px}
+    @keyframes sp{to{transform:rotate(360deg)}}
+
+    .toast{position:fixed;bottom:24px;right:24px;background:#1a1a2e;color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:999;display:flex;align-items:center;gap:8px;animation:ti .3s cubic-bezier(.16,1,.3,1)}
+    @keyframes ti{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+    @media(max-width:600px){.main{padding:16px}.topbar{padding:0 16px}.toolbar{flex-direction:column;align-items:stretch}}
+  </style>
 </head>
 <body>
-    <div id="loginSection">
-        <h1>Admin Login</h1>
-        <input type="text" id="adminUser" placeholder="Username">
-        <input type="password" id="adminPass" placeholder="Password">
-        <button onclick="handleLogin()">Login</button>
+
+<!-- LOGIN -->
+<div id="LS">
+  <div class="lc">
+    <div class="brand"><div class="ico">🔐</div><div class="brand-name">Admin Login</div></div>
+    <h2>Welcome Back</h2>
+    <p>Sign in to manage contact submissions.</p>
+    <div class="fg">
+      <label for="pw">Password</label>
+      <input type="password" id="pw" placeholder="••••••••"/>
+      <div class="lerr" id="lerr">Incorrect password.</div>
+    </div>
+    <button class="btn-login" onclick="doLogin()">Sign In →</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="AP">
+  <nav class="topbar">
+    <div class="tb-l">
+      <div class="ico">📬</div>
+      <div class="brand-name">ContactHub</div>
+      <div class="badge-admin">Admin</div>
+    </div>
+    <div class="tb-r">
+      <div class="av">A</div>
+      <button class="btn-out" onclick="doLogout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="pt">Contact Submissions</div>
+    <div class="ps">Review, approve or reject incoming contact requests — powered by Supabase.</div>
+
+    <div class="stats">
+      <div class="sc"><div class="si all">📊</div><div><div class="sn" id="s-all">—</div><div class="sl">Total</div></div></div>
+      <div class="sc"><div class="si pend">⏳</div><div><div class="sn" id="s-pend">—</div><div class="sl">Pending</div></div></div>
+      <div class="sc"><div class="si appr">✅</div><div><div class="sn" id="s-appr">—</div><div class="sl">Approved</div></div></div>
+      <div class="sc"><div class="si rej">❌</div><div><div class="sn" id="s-rej">—</div><div class="sl">Rejected</div></div></div>
     </div>
 
-    <div id="adminSection" class="hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h1>Leads Dashboard</h1>
-            <button onclick="logout()">Logout</button>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Message</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="leadsTable"></tbody>
-        </table>
+    <div class="toolbar">
+      <div class="sw">
+        <span class="si2">🔍</span>
+        <input type="text" id="q" placeholder="Search name, phone, email…" oninput="renderTable()"/>
+      </div>
+      <div class="filters">
+        <button class="fb active" data-f="All"      onclick="setF(this)">All</button>
+        <button class="fb"         data-f="Pending"  onclick="setF(this)">Pending</button>
+        <button class="fb"         data-f="Approved" onclick="setF(this)">Approved</button>
+        <button class="fb"         data-f="Rejected" onclick="setF(this)">Rejected</button>
+      </div>
+      <button class="btn-ref" onclick="load()" title="Refresh">🔄</button>
     </div>
 
-    <script>
-        const SUPABASE_URL = 'https://decsarjhkrfvuxrsvzoo.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_HmrALuQ6Ta0lThN3AmZH_w_b2QQ9iSU';
-        const supabase = lib.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <div class="tw">
+      <div class="th2">
+        <div class="tt">Contacts</div>
+        <div class="tc" id="cnt">Loading…</div>
+      </div>
+      <div class="ts">
+        <table><thead>
+          <tr>
+            <th>Name</th><th>Phone</th><th>Email</th><th>Message</th>
+            <th>Status</th><th>Date</th><th>Actions</th>
+          </tr>
+        </thead><tbody id="tb"></tbody></table>
+      </div>
+      <div id="state"></div>
+    </div>
+  </div>
+</div>
 
-        // Check Session on Load
-        if (localStorage.getItem('isAdmin') === 'true') showDashboard();
+<script>
+// ════════════════════════════════════════
+//   🔧 PASTE YOUR SUPABASE CREDENTIALS
+// ════════════════════════════════════════
+const SUPABASE_URL  = 'https://decsarjhkrfvuxrsvzoo.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_HmrALuQ6Ta0lThN3AmZH_w_b2QQ9iSU';
+// ════════════════════════════════════════
 
-        async function handleLogin() {
-            const user = document.getElementById('adminUser').value;
-            const pass = document.getElementById('adminPass').value;
+const ADMIN_PASS = 'admin123';
+const API = `${SUPABASE_URL}/rest/v1`;
+const H = {
+  'apikey': SUPABASE_ANON,
+  'Authorization': `Bearer ${SUPABASE_ANON}`,
+  'Content-Type': 'application/json'
+};
 
-            const { data, error } = await supabase.rpc('verify_admin_password', {
-                target_username: user,
-                typed_password: pass
-            });
+const $ = id => document.getElementById(id);
+let all = [], activeF = 'All';
 
-            if (data === true) {
-                localStorage.setItem('isAdmin', 'true');
-                showDashboard();
-            } else {
-                alert("Invalid Credentials");
-            }
-        }
+// ── AUTH ──
+function doLogin(){
+  const pw = $('pw').value;
+  if(pw === ADMIN_PASS){
+    sessionStorage.setItem('ch_auth','1');
+    $('LS').style.display='none';
+    $('AP').style.display='block';
+    load();
+  } else {
+    $('lerr').classList.add('on');
+    $('pw').classList.add('bad');
+  }
+}
+function doLogout(){ sessionStorage.removeItem('ch_auth'); location.reload(); }
+$('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+if(sessionStorage.getItem('ch_auth')==='1'){
+  $('LS').style.display='none'; $('AP').style.display='block'; load();
+}
 
-        function showDashboard() {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('adminSection').classList.remove('hidden');
-            fetchLeads();
-        }
+// ── FILTER ──
+function setF(btn){
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeF = btn.dataset.f;
+  renderTable();
+}
 
-        async function fetchLeads() {
-            const { data, error } = await supabase
-                .from('contacts')
-                .select('*')
-                .order('submitted_at', { ascending: false });
-            
-            const tbody = document.getElementById('leadsTable');
-            tbody.innerHTML = data.map(lead => `
-                <tr>
-                    <td>${new Date(lead.submitted_at).toLocaleDateString()}</td>
-                    <td>${lead.name}<br><small>${lead.phone}</small></td>
-                    <td>${lead.message || ''}</td>
-                    <td><span class="status-badge ${lead.status}">${lead.status}</span></td>
-                    <td>
-                        <select onchange="updateStatus('${lead.id}', this.value)">
-                            <option value="">Update...</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Approved">Approve</option>
-                            <option value="Rejected">Reject</option>
-                        </select>
-                    </td>
-                </tr>
-            `).join('');
-        }
+// ── LOAD ──
+async function load(){
+  showState('loading');
+  // localStorage fallback
+  if(SUPABASE_URL.includes('YOUR_PROJECT_ID')){
+    console.warn('[Admin] Not configured — reading localStorage');
+    const local = JSON.parse(localStorage.getItem('ch_contacts')||'[]');
+    all = local.map(r=>({
+      id:String(r.id), name:r.name, phone:r.phone, email:r.email,
+      message:r.message, status:r.status||'Pending', submitted_at:r.submitted_at
+    }));
+    updateStats(); renderTable(); return;
+  }
+  try{
+    // Fetch all rows sorted newest first
+    const res = await fetch(
+      `${API}/contacts?order=submitted_at.desc&limit=1000`,
+      {headers: H}
+    );
+    if(!res.ok){ const e=await res.json(); throw new Error(e.message||`HTTP ${res.status}`); }
+    all = await res.json();
+    console.log('[Admin] Loaded', all.length, 'records');
+    updateStats(); renderTable();
+  } catch(err){
+    console.error('[Admin] Load error:', err);
+    showState('error', err.message);
+  }
+}
 
-        async function updateStatus(id, newStatus) {
-            if (!newStatus) return;
-            await supabase.from('contacts').update({ status: newStatus }).eq('id', id);
-            fetchLeads();
-        }
+// ── STATS ──
+function updateStats(){
+  $('s-all').textContent  = all.length;
+  $('s-pend').textContent = all.filter(r=>r.status==='Pending').length;
+  $('s-appr').textContent = all.filter(r=>r.status==='Approved').length;
+  $('s-rej').textContent  = all.filter(r=>r.status==='Rejected').length;
+}
 
-        function logout() {
-            localStorage.removeItem('isAdmin');
-            location.reload();
-        }
-    </script>
+// ── RENDER ──
+function renderTable(){
+  const q = $('q').value.toLowerCase().trim();
+  const filtered = all.filter(r=>{
+    const mf = activeF==='All' || r.status===activeF;
+    const ms = !q ||
+      (r.name||'').toLowerCase().includes(q)||
+      (r.phone||'').toLowerCase().includes(q)||
+      (r.email||'').toLowerCase().includes(q)||
+      (r.message||'').toLowerCase().includes(q);
+    return mf && ms;
+  });
+
+  $('cnt').textContent = `${filtered.length} record${filtered.length!==1?'s':''}`;
+  const tb = $('tb');
+
+  if(!filtered.length){ tb.innerHTML=''; showState('empty'); return; }
+  showState('none');
+
+  tb.innerHTML = filtered.map(r=>{
+    const st = r.status||'Pending';
+    const dt = r.submitted_at ? fmtDate(r.submitted_at) : '—';
+    return `<tr>
+      <td class="nc">${esc(r.name||'—')}</td>
+      <td class="pc">${esc(r.phone||'—')}</td>
+      <td>${esc(r.email||'—')}</td>
+      <td class="mc" title="${esc(r.message||'')}">${esc(r.message||'—')}</td>
+      <td><span class="bdg ${st}"><span class="bdg-dot"></span>${st}</span></td>
+      <td class="dc">${dt}</td>
+      <td><div class="acts">
+        <button class="ba ba-ok" ${st==='Approved'?'disabled':''} onclick="upd('${r.id}','Approved',this)">✓ Approve</button>
+        <button class="ba ba-no" ${st==='Rejected'?'disabled':''} onclick="upd('${r.id}','Rejected',this)">✗ Reject</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── UPDATE ──
+async function upd(id, status, btn){
+  btn.disabled = true;
+  const row = btn.closest('tr');
+  row.style.opacity = '.6';
+
+  // localStorage fallback
+  if(SUPABASE_URL.includes('YOUR_PROJECT_ID')){
+    const local = JSON.parse(localStorage.getItem('ch_contacts')||'[]');
+    const idx = local.findIndex(r=>String(r.id)===id);
+    if(idx!==-1){ local[idx].status=status; localStorage.setItem('ch_contacts',JSON.stringify(local)); }
+    const rec = all.find(r=>r.id===id);
+    if(rec) rec.status=status;
+    updateStats(); renderTable();
+    toast(status==='Approved'?'✅ Approved!':'❌ Rejected!');
+    return;
+  }
+
+  try{
+    const res = await fetch(`${API}/contacts?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{...H,'Prefer':'return=minimal'},
+      body: JSON.stringify({status})
+    });
+    if(!res.ok){ const e=await res.json(); throw new Error(e.message||`HTTP ${res.status}`); }
+    const rec = all.find(r=>r.id===id);
+    if(rec) rec.status=status;
+    updateStats(); renderTable();
+    toast(status==='Approved'?'✅ Approved!':'❌ Rejected!');
+    console.log('[Admin] Updated', id, '→', status);
+  } catch(err){
+    console.error('[Admin] Update error:', err);
+    toast('⚠️ Failed: '+err.message);
+    btn.disabled=false; row.style.opacity='1';
+  }
+}
+
+// ── HELPERS ──
+function showState(type, msg){
+  const el = $('state'), tb = $('tb');
+  if(type==='loading'){
+    tb.innerHTML='';
+    el.innerHTML=`<div class="loading-s"><div class="lsp"></div><p>Loading contacts…</p></div>`;
+  } else if(type==='empty'){
+    el.innerHTML=`<div class="empty"><div class="ei">📭</div><h3>No contacts found</h3><p>Try changing the filter or search.</p></div>`;
+  } else if(type==='error'){
+    tb.innerHTML='';
+    el.innerHTML=`<div class="error-s"><div class="ei">⚠️</div><h3>Failed to load</h3><p>${esc(msg||'')}</p></div>`;
+  } else { el.innerHTML=''; }
+}
+
+function fmtDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' '+
+         d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let toastT;
+function toast(msg){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  clearTimeout(toastT);
+  const t=document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  toastT=setTimeout(()=>t.remove(),3000);
+}
+</script>
 </body>
 </html>
